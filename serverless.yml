@@ -10,5 +10,17 @@ package:
 
 
 functions:
-  test:
+
+  plain:
+    handler: handler.HandlePlain
+
+  get:
     handler: handler.Handle
+    events:
+    - http:
+        path: test/{id}
+        method: get
+        request:
+          parameters:
+            paths:
+              id: true
