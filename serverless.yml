@@ -1,0 +1,14 @@
+service: gotest
+
+provider:
+  name: aws
+  runtime: python2.7
+  region: eu-west-1
+
+package:
+  artifact: handler.zip
+
+
+functions:
+  test:
+    handler: handler.Handle
