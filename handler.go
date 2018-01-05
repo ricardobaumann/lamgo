@@ -6,6 +6,7 @@ import (
 	"github.com/eawsy/aws-lambda-go-net/service/lambda/runtime/net"
 	"github.com/eawsy/aws-lambda-go-net/service/lambda/runtime/net/apigatewayproxy"
 	"github.com/eawsy/aws-lambda-go-core/service/lambda/runtime"
+	"io/ioutil"
 )
 
 // Handle is the exported handler called by AWS Lambda.
@@ -24,9 +25,20 @@ func init() {
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World!"))
+	w.Write([]byte("Hello, World! from api"))
 }
 
 func HandlePlain(evt interface{}, ctx *runtime.Context) (string, error) {
-	return "Hello, World!", nil
+	putEndpoint :=  "http://wm68vs7yg8.execute-api.eu-west-1.amazonaws.com/dev/test/122" //os.Getenv("apiBaseUrl")
+	println(putEndpoint)
+	resp, err := http.Get(putEndpoint)
+	if err != nil {
+		return "",err
+	}
+	bodyContent,err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "",err
+	}
+
+	return string(bodyContent), nil
 }

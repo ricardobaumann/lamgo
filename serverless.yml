@@ -5,6 +5,10 @@ provider:
   runtime: python2.7
   region: eu-west-1
 
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+
 package:
   artifact: handler.zip
 
@@ -13,6 +17,8 @@ functions:
 
   plain:
     handler: handler.HandlePlain
+    environment:
+      apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
 
   get:
     handler: handler.Handle
