@@ -7,6 +7,10 @@ import (
 	"github.com/eawsy/aws-lambda-go-net/service/lambda/runtime/net/apigatewayproxy"
 	"github.com/eawsy/aws-lambda-go-core/service/lambda/runtime"
 	"io/ioutil"
+	"os"
+	"strings"
+	"io"
+	"log"
 )
 
 // Handle is the exported handler called by AWS Lambda.
@@ -25,13 +29,21 @@ func init() {
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World! from api"))
+	switch r.Method {
+	case "GET":
+		id := strings.TrimPrefix(r.URL.Path, "/test/")
+		w.Write([]byte("Hello, World! from api for id "+id))
+	case "PUT":
+		body, _ := ioutil.ReadAll(r.Body)
+		w.Write([]byte(string(body)))
+	}
+
 }
 
 func HandlePlain(evt interface{}, ctx *runtime.Context) (string, error) {
-	putEndpoint :=  "http://wm68vs7yg8.execute-api.eu-west-1.amazonaws.com/dev/test/122" //os.Getenv("apiBaseUrl")
-	println(putEndpoint)
-	resp, err := http.Get(putEndpoint)
+	getEndpoint :=  os.Getenv("apiBaseUrl")+"/test/122"
+	println(getEndpoint)
+	resp, err := http.Get(getEndpoint)
 	if err != nil {
 		return "",err
 	}
@@ -39,6 +51,25 @@ func HandlePlain(evt interface{}, ctx *runtime.Context) (string, error) {
 	if err != nil {
 		return "",err
 	}
-
+	putEndpoint := os.Getenv("apiBaseUrl")+"/test"
+	putRequest(putEndpoint,strings.NewReader("{}"))
 	return string(bodyContent), nil
+}
+
+func putRequest(url string, data io.Reader)  {
+	client := &http.Client{}
+	req, err := http.NewRequest(http.MethodPut, url, data)
+	if err != nil {
+		// handle error
+		log.Fatal(err)
+	} else {
+		log.Print(req.Body)
+	}
+	_, err = client.Do(req)
+	if err != nil {
+		// handle error
+		log.Fatal(err)
+	}
+
+
 }

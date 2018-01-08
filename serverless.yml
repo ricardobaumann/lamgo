@@ -18,14 +18,14 @@ functions:
   plain:
     handler: handler.HandlePlain
     environment:
-      apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
+      apiBaseUrl: { "Fn::Join" : ["", ["http://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
 
   get:
     handler: handler.Handle
     events:
     - http:
         path: test/{id}
-        method: get
+        method: any
         request:
           parameters:
             paths:
